@@ -1,0 +1,488 @@
+# AgentLearn4j Project Structure Plan
+
+## Overview
+This plan outlines a modular Spring Boot 3.5.9 application structure organized by agent capabilities, following Spring Boot best practices and leveraging the Spring AI Alibaba Agent Framework.
+
+## Architecture Principles
+1. **Modular Design**: Each agent capability is a separate module/package
+2. **Separation of Concerns**: Clear separation between web, service, agent, and infrastructure layers
+3. **Spring Boot Conventions**: Standard Spring Boot structure with clear package organization
+4. **Configuration-Driven**: Externalized configuration for flexibility
+5. **Testability**: Each module is independently testable
+
+## Proposed Project Structure
+
+```
+agentLearn4j/
+├── pom.xml                                          # Root Maven POM
+├── CLAUDE.md                                        # Claude Code instructions
+├── README.md                                        # Project documentation
+├── src/
+│   ├── main/
+│   │   ├── java/com/czf/agentLearn4j/agentLearn4j/
+│   │   │   ├── AgentLearn4jApplication.java        # Main Spring Boot application
+│   │   │   │
+│   │   │   ├── config/                              # Configuration classes
+│   │   │   │   ├── AgentConfig.java                # Agent framework configuration
+│   │   │   │   ├── DashScopeConfig.java            # DashScope ChatModel configuration
+│   │   │   │   ├── SecurityConfig.java             # Security configuration (if needed)
+│   │   │   │   └── WebConfig.java                  # Web MVC configuration
+│   │   │   │
+│   │   │   ├── common/                              # Shared common utilities
+│   │   │   │   ├── constants/                      # Application constants
+│   │   │   │   │   ├── AgentConstants.java         # Agent-related constants
+│   │   │   │   │   └── ApiConstants.java           # API constants
+│   │   │   │   ├── exception/                      # Custom exceptions
+│   │   │   │   │   ├── AgentException.java         # Base agent exception
+│   │   │   │   │   ├── AgentNotFoundException.java
+│   │   │   │   │   └── AgentExecutionException.java
+│   │   │   │   ├── handler/                        # Global exception handlers
+│   │   │   │   │   └── GlobalExceptionHandler.java
+│   │   │   │   └── util/                           # Utility classes
+│   │   │   │       ├── JsonUtil.java
+│   │   │   │       └── ValidationUtil.java
+│   │   │   │
+│   │   │   ├── model/                               # Domain models and DTOs
+│   │   │   │   ├── dto/                            # Data Transfer Objects
+│   │   │   │   │   ├── request/                    # Request DTOs
+│   │   │   │   │   │   ├── AgentRequest.java
+│   │   │   │   │   │   ├── ConversationRequest.java
+│   │   │   │   │   │   └── ToolExecutionRequest.java
+│   │   │   │   │   └── response/                   # Response DTOs
+│   │   │   │   │       ├── AgentResponse.java
+│   │   │   │   │       ├── ConversationResponse.java
+│   │   │   │   │       └── ApiResponse.java        # Standard API response wrapper
+│   │   │   │   └── entity/                         # Domain entities (if using DB)
+│   │   │   │       ├── Conversation.java
+│   │   │   │       ├── Message.java
+│   │   │   │       └── AgentExecution.java
+│   │   │   │
+│   │   │   ├── agent/                               # Agent capability modules
+│   │   │   │   │
+│   │   │   │   ├── core/                           # Core agent abstractions
+│   │   │   │   │   ├── BaseAgent.java              # Abstract base agent
+│   │   │   │   │   ├── AgentRegistry.java          # Agent registration and discovery
+│   │   │   │   │   ├── AgentExecutor.java          # Agent execution orchestrator
+│   │   │   │   │   └── AgentContext.java           # Execution context holder
+│   │   │   │   │
+│   │   │   │   ├── conversation/                   # Conversational Agent Module
+│   │   │   │   │   ├── ConversationalAgent.java    # Main conversational agent
+│   │   │   │   │   ├── ConversationService.java    # Conversation management
+│   │   │   │   │   ├── MessageProcessor.java       # Message processing logic
+│   │   │   │   │   └── ConversationMemory.java     # Conversation history management
+│   │   │   │   │
+│   │   │   │   ├── rag/                            # RAG (Retrieval Augmented Generation) Module
+│   │   │   │   │   ├── RagAgent.java               # RAG-enabled agent
+│   │   │   │   │   ├── DocumentRetriever.java      # Document retrieval service
+│   │   │   │   │   ├── EmbeddingService.java       # Text embedding service
+│   │   │   │   │   ├── VectorStoreService.java     # Vector database operations
+│   │   │   │   │   └── DocumentProcessor.java      # Document preprocessing
+│   │   │   │   │
+│   │   │   │   ├── tool/                           # Tool-using Agent Module
+│   │   │   │   │   ├── ToolAgent.java              # Tool-enabled agent
+│   │   │   │   │   ├── ToolRegistry.java           # Tool registration
+│   │   │   │   │   ├── ToolExecutor.java           # Tool execution handler
+│   │   │   │   │   └── tools/                      # Specific tool implementations
+│   │   │   │   │       ├── WeatherTool.java        # Example: Weather query tool
+│   │   │   │   │       ├── CalculatorTool.java     # Example: Calculator tool
+│   │   │   │   │       ├── DatabaseTool.java       # Example: Database query tool
+│   │   │   │   │       └── WebSearchTool.java      # Example: Web search tool
+│   │   │   │   │
+│   │   │   │   ├── planning/                       # Planning Agent Module
+│   │   │   │   │   ├── PlanningAgent.java          # Planning/reasoning agent
+│   │   │   │   │   ├── TaskPlanner.java            # Task decomposition
+│   │   │   │   │   ├── PlanExecutor.java           # Plan execution
+│   │   │   │   │   └── PlanValidator.java          # Plan validation
+│   │   │   │   │
+│   │   │   │   ├── react/                          # ReAct (Reasoning + Acting) Module
+│   │   │   │   │   ├── ReactAgent.java             # ReAct pattern agent
+│   │   │   │   │   ├── ReasoningEngine.java        # Reasoning logic
+│   │   │   │   │   ├── ActionSelector.java         # Action selection
+│   │   │   │   │   └── ObservationProcessor.java   # Observation handling
+│   │   │   │   │
+│   │   │   │   ├── multiagent/                     # Multi-Agent Collaboration Module
+│   │   │   │   │   ├── MultiAgentCoordinator.java  # Agent coordination
+│   │   │   │   │   ├── AgentCommunicator.java      # Inter-agent communication
+│   │   │   │   │   ├── TaskDistributor.java        # Task distribution
+│   │   │   │   │   └── ResultAggregator.java       # Result aggregation
+│   │   │   │   │
+│   │   │   │   └── workflow/                       # Workflow Agent Module
+│   │   │   │       ├── WorkflowAgent.java          # Workflow orchestration agent
+│   │   │   │       ├── WorkflowEngine.java         # Workflow execution engine
+│   │   │   │       ├── WorkflowDefinition.java     # Workflow definition model
+│   │   │   │       └── StepExecutor.java           # Individual step executor
+│   │   │   │
+│   │   │   ├── controller/                          # REST Controllers
+│   │   │   │   ├── ConversationController.java     # Conversation endpoints
+│   │   │   │   ├── RagController.java              # RAG endpoints
+│   │   │   │   ├── ToolController.java             # Tool execution endpoints
+│   │   │   │   ├── PlanningController.java         # Planning endpoints
+│   │   │   │   ├── ReactController.java            # ReAct endpoints
+│   │   │   │   ├── MultiAgentController.java       # Multi-agent endpoints
+│   │   │   │   └── WorkflowController.java         # Workflow endpoints
+│   │   │   │
+│   │   │   ├── service/                             # Business logic services
+│   │   │   │   ├── AgentService.java               # Core agent service
+│   │   │   │   ├── ConversationManagementService.java
+│   │   │   │   ├── DocumentService.java            # Document management
+│   │   │   │   ├── ToolManagementService.java      # Tool management
+│   │   │   │   └── WorkflowManagementService.java  # Workflow management
+│   │   │   │
+│   │   │   └── repository/                          # Data access layer (if using DB)
+│   │   │       ├── ConversationRepository.java
+│   │   │       ├── MessageRepository.java
+│   │   │       └── AgentExecutionRepository.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.properties               # Default configuration
+│   │       ├── application-dev.properties           # Development environment
+│   │       ├── application-prod.properties          # Production environment
+│   │       ├── application-test.properties          # Test environment
+│   │       ├── prompts/                             # Agent prompt templates
+│   │       │   ├── conversation-prompts.txt
+│   │       │   ├── rag-prompts.txt
+│   │       │   ├── planning-prompts.txt
+│   │       │   └── react-prompts.txt
+│   │       ├── workflows/                           # Workflow definitions (JSON/YAML)
+│   │       │   ├── sample-workflow.json
+│   │       │   └── complex-workflow.yaml
+│   │       ├── static/                              # Static web resources
+│   │       │   ├── css/
+│   │       │   ├── js/
+│   │       │   └── images/
+│   │       └── templates/                           # Thymeleaf templates (if using)
+│   │
+│   └── test/
+│       └── java/com/czf/agentLearn4j/agentLearn4j/
+│           ├── AgentLearn4jApplicationTests.java    # Application context test
+│           ├── agent/                                # Agent module tests
+│           │   ├── core/
+│           │   │   └── AgentRegistryTest.java
+│           │   ├── conversation/
+│           │   │   └── ConversationalAgentTest.java
+│           │   ├── rag/
+│           │   │   └── RagAgentTest.java
+│           │   ├── tool/
+│           │   │   └── ToolAgentTest.java
+│           │   ├── planning/
+│           │   │   └── PlanningAgentTest.java
+│           │   ├── react/
+│           │   │   └── ReactAgentTest.java
+│           │   ├── multiagent/
+│           │   │   └── MultiAgentCoordinatorTest.java
+│           │   └── workflow/
+│           │       └── WorkflowAgentTest.java
+│           ├── controller/
+│           │   └── ConversationControllerTest.java
+│           ├── service/
+│           │   └── AgentServiceTest.java
+│           └── integration/                          # Integration tests
+│               └── AgentIntegrationTest.java
+```
+
+## Module Descriptions
+
+### 1. Core Module (`agent/core/`)
+**Purpose**: Foundation abstractions for all agent types
+
+**Key Components**:
+- `BaseAgent`: Abstract base class with common agent functionality
+- `AgentRegistry`: Service locator pattern for agent discovery
+- `AgentExecutor`: Orchestrates agent execution with error handling
+- `AgentContext`: Thread-safe context for agent execution state
+
+**Responsibilities**:
+- Agent lifecycle management
+- Common interfaces and contracts
+- Agent registration and discovery
+- Execution context management
+
+### 2. Conversation Module (`agent/conversation/`)
+**Purpose**: Basic conversational AI capabilities
+
+**Key Components**:
+- `ConversationalAgent`: Simple question-answer agent
+- `ConversationService`: Manages conversation flow
+- `MessageProcessor`: Processes and validates messages
+- `ConversationMemory`: Maintains conversation history
+
+**Use Cases**:
+- Chatbot functionality
+- Q&A systems
+- Customer support automation
+- Interactive tutorials
+
+### 3. RAG Module (`agent/rag/`)
+**Purpose**: Knowledge retrieval and augmented generation
+
+**Key Components**:
+- `RagAgent`: Combines retrieval with generation
+- `DocumentRetriever`: Fetches relevant documents
+- `EmbeddingService`: Generates text embeddings
+- `VectorStoreService`: Manages vector database
+- `DocumentProcessor`: Preprocesses documents for indexing
+
+**Use Cases**:
+- Document Q&A
+- Knowledge base search
+- Context-aware responses
+- Enterprise search applications
+
+### 4. Tool Module (`agent/tool/`)
+**Purpose**: Agents that can use external tools/functions
+
+**Key Components**:
+- `ToolAgent`: Agent with tool-calling capabilities
+- `ToolRegistry`: Registers and manages available tools
+- `ToolExecutor`: Executes tool calls safely
+- Tool implementations (Weather, Calculator, Database, WebSearch)
+
+**Use Cases**:
+- Function calling
+- API integration
+- External system interaction
+- Computational tasks
+
+### 5. Planning Module (`agent/planning/`)
+**Purpose**: Multi-step task planning and reasoning
+
+**Key Components**:
+- `PlanningAgent`: Creates and executes plans
+- `TaskPlanner`: Decomposes complex tasks
+- `PlanExecutor`: Executes plans step-by-step
+- `PlanValidator`: Validates plan feasibility
+
+**Use Cases**:
+- Complex task automation
+- Multi-step workflows
+- Goal-oriented behavior
+- Strategic decision making
+
+### 6. ReAct Module (`agent/react/`)
+**Purpose**: Reasoning and Acting pattern implementation
+
+**Key Components**:
+- `ReactAgent`: Implements ReAct pattern
+- `ReasoningEngine`: Handles thought/reasoning steps
+- `ActionSelector`: Chooses appropriate actions
+- `ObservationProcessor`: Processes action results
+
+**Use Cases**:
+- Iterative problem solving
+- Trial-and-error scenarios
+- Self-correcting agents
+- Exploratory tasks
+
+### 7. Multi-Agent Module (`agent/multiagent/`)
+**Purpose**: Coordination of multiple agents
+
+**Key Components**:
+- `MultiAgentCoordinator`: Orchestrates multiple agents
+- `AgentCommunicator`: Handles inter-agent messaging
+- `TaskDistributor`: Distributes work among agents
+- `ResultAggregator`: Combines results from multiple agents
+
+**Use Cases**:
+- Collaborative problem solving
+- Distributed task execution
+- Specialized agent teams
+- Parallel processing
+
+### 8. Workflow Module (`agent/workflow/`)
+**Purpose**: Structured workflow orchestration
+
+**Key Components**:
+- `WorkflowAgent`: Executes defined workflows
+- `WorkflowEngine`: Core workflow execution engine
+- `WorkflowDefinition`: Workflow configuration model
+- `StepExecutor`: Executes individual workflow steps
+
+**Use Cases**:
+- Business process automation
+- Predefined agent sequences
+- Conditional execution flows
+- Repeatable processes
+
+## Configuration Structure
+
+### application.properties
+```properties
+# Application
+spring.application.name=agentLearn4j
+server.port=8080
+
+# DashScope Configuration
+spring.ai.dashscope.api-key=${DASHSCOPE_API_KEY}
+spring.ai.dashscope.chat.options.model=qwen-plus
+spring.ai.dashscope.chat.options.temperature=0.7
+spring.ai.dashscope.chat.options.max-tokens=2000
+
+# Agent Configuration
+agent.default.timeout=30000
+agent.max.concurrent.executions=10
+agent.conversation.max-history-size=100
+agent.rag.chunk-size=512
+agent.rag.chunk-overlap=50
+
+# Logging
+logging.level.com.czf.agentLearn4j=DEBUG
+logging.level.org.springframework.ai=INFO
+
+# Database (if needed)
+# spring.datasource.url=jdbc:postgresql://localhost:5432/agentlearn
+# spring.datasource.username=${DB_USERNAME}
+# spring.datasource.password=${DB_PASSWORD}
+# spring.jpa.hibernate.ddl-auto=update
+```
+
+## API Design
+
+### RESTful Endpoint Pattern
+```
+/api/v1/
+├── /conversation              # Conversational agent endpoints
+│   ├── POST /chat            # Send message
+│   └── GET /{id}/history     # Get conversation history
+├── /rag                       # RAG agent endpoints
+│   ├── POST /query           # Query with retrieval
+│   └── POST /documents       # Upload documents
+├── /tools                     # Tool agent endpoints
+│   ├── POST /execute         # Execute with tools
+│   └── GET /available        # List available tools
+├── /planning                  # Planning agent endpoints
+│   └── POST /plan            # Create and execute plan
+├── /react                     # ReAct agent endpoints
+│   └── POST /solve           # Solve with ReAct pattern
+├── /multiagent                # Multi-agent endpoints
+│   └── POST /collaborate     # Collaborative execution
+└── /workflow                  # Workflow endpoints
+    ├── POST /execute         # Execute workflow
+    └── GET /definitions      # List workflows
+```
+
+## Testing Strategy
+
+### Unit Tests
+- Test each agent module independently
+- Mock external dependencies (DashScope, databases)
+- Test tool implementations
+- Test utility classes
+
+### Integration Tests
+- Test agent-to-agent communication
+- Test workflow execution end-to-end
+- Test API endpoints with TestRestTemplate
+- Test database interactions (if applicable)
+
+### Test Configuration
+- Use `@SpringBootTest` for integration tests
+- Use `@WebMvcTest` for controller tests
+- Use `@DataJpaTest` for repository tests (if applicable)
+- Use test profiles with `application-test.properties`
+
+## Implementation Phases
+
+### Phase 1: Foundation (Week 1-2)
+- [ ] Set up project structure
+- [ ] Configure DashScope integration
+- [ ] Implement core module (BaseAgent, AgentRegistry, AgentExecutor)
+- [ ] Implement common utilities and exception handling
+- [ ] Set up logging and monitoring
+
+### Phase 2: Basic Agents (Week 3-4)
+- [ ] Implement Conversation module
+- [ ] Implement Tool module with 2-3 example tools
+- [ ] Create REST controllers for basic agents
+- [ ] Write unit tests for implemented modules
+- [ ] Create API documentation
+
+### Phase 3: Advanced Agents (Week 5-6)
+- [ ] Implement RAG module
+- [ ] Implement Planning module
+- [ ] Implement ReAct module
+- [ ] Add integration tests
+- [ ] Add performance monitoring
+
+### Phase 4: Collaboration (Week 7-8)
+- [ ] Implement Multi-Agent module
+- [ ] Implement Workflow module
+- [ ] Create workflow definition examples
+- [ ] End-to-end testing
+- [ ] Documentation and deployment guides
+
+## Dependencies to Add
+
+### Required Dependencies
+```xml
+<!-- Vector Store (for RAG) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-pgvector-store</artifactId>
+</dependency>
+
+<!-- JSON Processing -->
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+</dependency>
+
+<!-- Validation -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+
+<!-- Monitoring (optional) -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+<!-- API Documentation (optional) -->
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+```
+
+## Best Practices
+
+### Code Organization
+1. One agent capability = one package under `agent/`
+2. Each module should be independently testable
+3. Use dependency injection for all components
+4. Avoid circular dependencies between modules
+
+### Configuration
+1. Use environment variables for sensitive data
+2. Provide sensible defaults in application.properties
+3. Use Spring profiles for different environments
+4. Document all configuration properties
+
+### Error Handling
+1. Create specific exceptions for each module
+2. Use `@ControllerAdvice` for global exception handling
+3. Return meaningful error messages to clients
+4. Log errors with appropriate context
+
+### Testing
+1. Aim for >80% code coverage
+2. Test happy path and error scenarios
+3. Use test containers for integration tests
+4. Mock external services in unit tests
+
+### Documentation
+1. Use JavaDoc for public APIs
+2. Maintain README for each module
+3. Document API endpoints with OpenAPI/Swagger
+4. Keep CLAUDE.md updated with build commands
+
+## Notes
+
+- This structure is designed to scale as new agent capabilities are added
+- Each module can be developed and tested independently
+- The core module provides common functionality to avoid code duplication
+- REST controllers provide a clean API layer above the agent logic
+- Configuration is externalized for flexibility across environments
+- The structure follows Domain-Driven Design principles with clear bounded contexts per agent type

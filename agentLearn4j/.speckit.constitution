@@ -1,0 +1,190 @@
+# Project Constitution
+
+This document defines the core principles and standards for the agentLearn4j project.
+
+## Code Quality Principles
+
+### 1. Clean Code Standards
+- Write self-documenting code with clear, descriptive names for classes, methods, and variables
+- Follow Java naming conventions: PascalCase for classes, camelCase for methods/variables, UPPER_SNAKE_CASE for constants
+- Keep methods focused on a single responsibility (SRP)
+- Limit method length to ~20-30 lines; extract complex logic into helper methods
+- Use meaningful variable names that describe the data they hold, not their type
+- Avoid magic numbers and strings; use constants or configuration properties
+
+### 2. Spring Boot Best Practices
+- Use dependency injection via constructor injection (preferred) or field injection with `@Autowired`
+- Organize code into clear layers: Controllers, Services, Repositories, Models
+- Use `@Service`, `@Repository`, `@Controller`, `@RestController` annotations appropriately
+- Leverage Spring Boot's configuration properties with `@ConfigurationProperties`
+- Keep controllers thin; business logic belongs in service classes
+- Use appropriate HTTP status codes and REST conventions in API endpoints
+
+### 3. Lombok Usage Guidelines
+- Use `@Data` for simple POJOs with getters, setters, equals, hashCode, and toString
+- Use `@Builder` for objects with many optional fields or complex construction
+- Use `@Slf4j` for logging instead of manually creating logger instances
+- Use `@RequiredArgsConstructor` for constructor injection with final fields
+- Avoid `@AllArgsConstructor` and `@NoArgsConstructor` unless specifically needed
+- Be cautious with `@ToString` on entities to avoid circular references
+
+### 4. Error Handling and Resilience
+- Never swallow exceptions silently; always log or handle appropriately
+- Use custom exception classes that extend RuntimeException for business logic errors
+- Implement `@ControllerAdvice` for global exception handling in REST APIs
+- Provide meaningful error messages to users while logging technical details
+- Use Optional instead of returning null when a value might be absent
+- Implement proper validation using `@Valid` and Bean Validation annotations
+
+## Testing Standards
+
+### 1. Test Coverage Requirements
+- Maintain minimum 80% code coverage for service layer logic
+- Achieve 70%+ overall project code coverage
+- Critical business logic must have 100% coverage
+- All public API endpoints must have integration tests
+
+### 2. Unit Testing Standards
+- Use JUnit 5 (Jupiter) for all unit tests
+- Follow naming convention: `methodName_condition_expectedResult()`
+- Use `@Mock` and `@InjectMocks` from Mockito for dependency mocking
+- Each test should test one specific behavior
+- Use `@DisplayName` for readable test descriptions
+- Organize tests with `@Nested` classes for related test groups
+
+### 3. Integration Testing Standards
+- Use `@SpringBootTest` for full application context tests
+- Use `@WebMvcTest` for controller layer tests
+- Use `@DataJpaTest` for repository layer tests (if JPA is added)
+- Mock external dependencies (AI services, APIs) in integration tests
+- Use `@TestConfiguration` for test-specific bean configurations
+- Clean up test data after each test using `@AfterEach` or transactional rollback
+
+### 4. Testing AI Agent Functionality
+- Mock DashScope ChatModel responses for predictable testing
+- Test agent behavior with various input scenarios
+- Verify proper error handling when AI services are unavailable
+- Test timeout and retry mechanisms
+- Validate agent response parsing and processing
+- Create test fixtures for common AI response patterns
+
+### 5. Test Organization
+- Mirror production package structure in test directories
+- Keep test utilities in a dedicated `test/util` package
+- Use `@BeforeEach` and `@AfterEach` for test setup/teardown
+- Avoid test interdependencies; each test must run independently
+- Use AssertJ for fluent, readable assertions
+
+## User Experience Consistency
+
+### 1. API Design Principles
+- Use RESTful conventions: GET for retrieval, POST for creation, PUT/PATCH for updates, DELETE for removal
+- Return consistent response structures across all endpoints
+- Use proper HTTP status codes: 200 (OK), 201 (Created), 400 (Bad Request), 404 (Not Found), 500 (Server Error)
+- Implement pagination for list endpoints returning large datasets
+- Use ISO 8601 format for dates and timestamps
+- Provide HATEOAS links where appropriate for API discoverability
+
+### 2. Error Response Standards
+```json
+{
+  "timestamp": "2026-01-08T10:30:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "User-friendly error message",
+  "path": "/api/agents/execute"
+}
+```
+- Always include timestamp, status code, error type, message, and path
+- Distinguish between user-facing messages and technical details
+- Never expose sensitive information (stack traces, credentials) in production
+- Localize error messages where multi-language support exists
+
+### 3. Logging Standards
+- Use SLF4J with `@Slf4j` from Lombok
+- Log levels: ERROR (failures), WARN (recoverable issues), INFO (important events), DEBUG (detailed flow), TRACE (verbose)
+- Log request/response at INFO level for API calls
+- Log agent interactions and AI service calls at DEBUG level
+- Include correlation IDs for request tracing
+- Never log sensitive data (passwords, API keys, PII)
+
+### 4. Configuration Management
+- Use `application.properties` or `application.yml` for configuration
+- Support environment-specific configs: `application-dev.yml`, `application-prod.yml`
+- Externalize all environment-specific values (URLs, API keys, timeouts)
+- Use Spring Boot's `@Value` or `@ConfigurationProperties` for accessing configs
+- Document all configuration properties with comments
+- Provide sensible defaults for optional configurations
+
+## Performance Requirements
+
+### 1. Response Time Targets
+- REST API endpoints: < 200ms (p95) for non-AI operations
+- AI agent operations: < 5 seconds (p95) for simple queries
+- Complex agent workflows: < 15 seconds (p95)
+- Health check endpoint: < 50ms
+
+### 2. Resource Management
+- Close resources properly using try-with-resources or `@PreDestroy`
+- Implement connection pooling for HTTP clients and database connections
+- Use async processing (`@Async`) for long-running operations
+- Implement proper timeout configurations for all external service calls
+- Monitor memory usage; avoid memory leaks from unclosed resources
+
+### 3. AI Service Optimization
+- Implement caching for repeated AI queries where appropriate
+- Use streaming responses for long AI-generated content
+- Set appropriate timeout values for DashScope API calls (30s default)
+- Implement retry logic with exponential backoff for transient failures
+- Monitor token usage to control costs
+
+### 4. Scalability Considerations
+- Design stateless services for horizontal scaling
+- Use distributed caching (Redis) for shared state if needed
+- Implement rate limiting for API endpoints
+- Use async messaging (e.g., Spring Kafka) for decoupled processing
+- Monitor application metrics with Spring Boot Actuator
+
+### 5. Database Performance (if applicable)
+- Use indexed columns for frequently queried fields
+- Implement pagination for large result sets
+- Use lazy loading for entity relationships
+- Optimize N+1 query problems with fetch joins
+- Monitor slow queries and optimize as needed
+
+## Security Standards
+
+### 1. API Security
+- Never commit API keys or secrets to version control
+- Use environment variables or secret management for credentials
+- Implement authentication and authorization for protected endpoints
+- Validate all user inputs to prevent injection attacks
+- Use HTTPS in production environments
+
+### 2. Data Protection
+- Sanitize user inputs before processing
+- Implement rate limiting to prevent abuse
+- Log security events (authentication failures, unauthorized access)
+- Regularly update dependencies to patch vulnerabilities
+
+## Documentation Standards
+
+### 1. Code Documentation
+- Document public APIs and complex algorithms with Javadoc
+- Keep comments up-to-date with code changes
+- Explain "why" in comments, not "what" (code should be self-explanatory)
+- Document non-obvious business rules and edge cases
+
+### 2. README and Project Documentation
+- Keep README.md updated with setup instructions
+- Document all configuration properties
+- Provide examples for common use cases
+- Maintain API documentation (OpenAPI/Swagger)
+
+## Continuous Improvement
+
+- Regularly review and refactor code to maintain quality
+- Update dependencies to latest stable versions quarterly
+- Monitor and act on performance metrics
+- Conduct code reviews for all significant changes
+- Learn from production issues and update practices accordingly

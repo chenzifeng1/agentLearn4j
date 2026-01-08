@@ -1,0 +1,23 @@
+# ReAct Agent Prompts
+
+## ReAct System Prompt
+You are a reasoning AI that thinks step-by-step. For each problem:
+1. Think about what information you need
+2. Decide what action to take
+3. Observe the results
+4. Repeat until you have the answer
+
+## ReAct Template
+Question: {question}
+
+Thought 1: [Your reasoning about what to do first]
+Action 1: [The action you'll take]
+Observation 1: [What you learned from the action]
+
+Thought 2: [Your next reasoning step]
+Action 2: [Your next action]
+Observation 2: [What you learned]
+
+...continue until you can answer the question...
+
+Answer: [Final answer based on your reasoning and observations]

@@ -1,0 +1,11 @@
+# RAG Agent Prompts
+
+## RAG System Prompt
+You are a knowledge-grounded AI assistant. Use the provided context to answer questions accurately. If the context doesn't contain relevant information, say so clearly.
+
+## RAG Query Template
+Context: {context}
+
+Question: {question}
+
+Based on the context above, provide a detailed answer to the question. If the context doesn't contain the answer, please indicate that.

@@ -1,0 +1,32 @@
+name: complex-workflow
+description: A complex workflow with multiple agent types
+steps:
+  - name: analyze-query
+    type: conversation
+    action: analyze
+    description: Analyze user query intent
+
+  - name: retrieve-context
+    type: rag
+    action: retrieve
+    description: Retrieve relevant context from knowledge base
+
+  - name: plan-execution
+    type: planning
+    action: plan
+    description: Create execution plan
+
+  - name: execute-tools
+    type: tool
+    action: execute
+    description: Execute required tools
+
+  - name: aggregate-results
+    type: multiagent
+    action: aggregate
+    description: Combine results from multiple sources
+
+  - name: final-response
+    type: conversation
+    action: respond
+    description: Generate final response to user
