@@ -24,7 +24,7 @@ public class AgentExecutor {
         long startTime = System.currentTimeMillis();
 
         try {
-            BaseAgent agent = agentRegistry.getAgent(agentType);
+            CustomBaseAgent agent = agentRegistry.getAgent(agentType);
 
             if (!agent.validateInput(input)) {
                 throw new AgentExecutionException("Invalid input for agent: " + agentType);

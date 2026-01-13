@@ -15,12 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AgentRegistry {
 
-    private final Map<String, BaseAgent> agents = new ConcurrentHashMap<>();
+    private final Map<String, CustomBaseAgent> agents = new ConcurrentHashMap<>();
 
     /**
      * Register an agent
      */
-    public void registerAgent(String agentType, BaseAgent agent) {
+    public void registerAgent(String agentType, CustomBaseAgent agent) {
         agents.put(agentType, agent);
         log.info("Agent registered: {}", agentType);
     }
@@ -28,8 +28,8 @@ public class AgentRegistry {
     /**
      * Get agent by type
      */
-    public BaseAgent getAgent(String agentType) {
-        BaseAgent agent = agents.get(agentType);
+    public CustomBaseAgent getAgent(String agentType) {
+        CustomBaseAgent agent = agents.get(agentType);
         if (agent == null) {
             throw new AgentNotFoundException(agentType);
         }
@@ -46,7 +46,7 @@ public class AgentRegistry {
     /**
      * Get all registered agents
      */
-    public Map<String, BaseAgent> getAllAgents() {
+    public Map<String, CustomBaseAgent> getAllAgents() {
         return agents;
     }
 
