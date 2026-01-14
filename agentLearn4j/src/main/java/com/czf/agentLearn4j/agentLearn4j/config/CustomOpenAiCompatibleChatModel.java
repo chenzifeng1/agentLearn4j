@@ -3,7 +3,6 @@ package com.czf.agentLearn4j.agentLearn4j.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -13,6 +12,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,12 +31,22 @@ import java.util.stream.Collectors;
 @Slf4j
 @Primary
 @Component
-@RequiredArgsConstructor
 public class CustomOpenAiCompatibleChatModel implements ChatModel {
 
-    private static final String API_URL = "https://openapi-ait.ke.com/v1/chat/completions";
-    private static final String API_KEY = "yIPijvEE3lUpZ5jW45l4weYHDJpqpjBI";
-    private static final String MODEL = "gpt-5-chat";
+    @Value("${api.openai.url}")
+    private String apiUrl;
+
+    @Value("${api.openai.key}")
+    private String apiKey;
+
+    @Value("${api.openai.model}")
+    private String model;
+
+    @Value("${api.openai.temperature:0.7}")
+    private Double temperature;
+
+    @Value("${api.openai.max-tokens:2000}")
+    private Integer maxTokens;
 
     private final RestClient restClient;
 
@@ -73,8 +83,8 @@ public class CustomOpenAiCompatibleChatModel implements ChatModel {
 
             // 发送请求
             OpenAiResponse response = restClient.post()
-                    .uri(API_URL)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + API_KEY)
+                    .uri(apiUrl)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
@@ -96,10 +106,10 @@ public class CustomOpenAiCompatibleChatModel implements ChatModel {
      */
     private OpenAiRequest buildRequest(Prompt prompt) {
         OpenAiRequest request = new OpenAiRequest();
-        request.setModel(MODEL);
+        request.setModel(model);
         request.setStream(false);
-        request.setTemperature(0.7);
-        request.setMaxTokens(2000);
+        request.setTemperature(temperature);
+        request.setMaxTokens(maxTokens);
 
         // 转换消息格式
         List<OpenAiMessage> messages = prompt.getInstructions().stream()
