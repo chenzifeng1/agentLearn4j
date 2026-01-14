@@ -1,8 +1,8 @@
 package com.czf.agentLearn4j.agentLearn4j.agent.workflow.node.handler;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class DefaultHandlerNode implements Function<Map<String, Object>, Map<String, Object>> {
 
-    private final DashScopeChatModel chatModel;
+    private final ChatModel chatModel;
 
     @Override
     public Map<String, Object> apply(Map<String, Object> state) {
